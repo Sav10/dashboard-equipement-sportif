@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<head>
+  <title>Dashboard : subventions aux sportifs</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <link rel="stylesheet" href="static/css/leaflet_1.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="static/css/L.Control.Sidebar.css" />
+
+  <script src="static/js/leaflet_1.js"></script>
+  <script src="static/js/d3.v4.min.js" charset="utf-8"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <script src="static/js/d3.tip.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+  <script src="static/js/jquery-1.11.3.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script src="static/js/typeahead.bundle.min.js"></script>
+  <script src="static/js/L.Control.Sidebar.js"></script>
+  <script src="static/js/lodash.js"></script>
+  <!-- <link rel="icon" type="image/png" href="static/rect01.png"> -->
+
+
+
+
+
+  <style>
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .legend {
+      padding: 0px 0px;
+      font: 10px sans-serif;
+      background: white;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
+
+    .key path {
+      display: none;
+    }
+    .chart text {
+      font: 11px sans-serif;
+      text-anchor: end;
+    }
+
+    .chart text.parti_name {
+      fill: black;
+      font: 11px sans-serif;
+      text-anchor: start;
+    }
+
+
+    .typeahead,
+    .tt-query,
+    .tt-hint {
+      width: 250px;
+      height: 32px;
+      padding: 5px 12px;
+      font-size: 15px;
+      line-height: 24px;
+      border: 2px solid #ccc;
+      -webkit-border-radius: 8px;
+      -moz-border-radius: 8px;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .typeahead {
+      background-color: #fff;
+    }
+
+    .typeahead:focus {
+      border: 2px solid #0097cf;
+    }
+
+    .tt-query {
+      -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    }
+
+    .tt-hint {
+      color: #999
+    }
+
+    .tt-menu {
+      width: 250px;
+      margin: 12px 0;
+      padding: 8px 0;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      -webkit-border-radius: 8px;
+      -moz-border-radius: 8px;
+      border-radius: 8px;
+      -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+      -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+      box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    }
+
+    .tt-suggestion {
+      padding: 3px 20px;
+      font-size: 15px;
+      line-height: 24px;
+    }
+
+    .tt-suggestion:hover {
+      cursor: pointer;
+      color: #fff;
+      background-color: #0097cf;
+    }
+
+    .tt-suggestion.tt-cursor {
+      color: #fff;
+      background-color: #0097cf;
+
+    }
+
+    .tt-suggestion p {
+      margin: 0;
+    }
+
+    .gist {
+      font-size: 14px;
+    }
+
+    /* example specific styles */
+    /* ----------------------- */
+
+    #custom-templates .empty-message {
+      padding: 5px 10px;
+      text-align: center;
+    }
+
+
+    #remote .typeahead-container{
+
+
+    }
+
+    nav.navbar-default{
+
+
+
+    }
+
+    #myNavbar {
+      top: 20px;
+    }
+
+    #intro_top {
+      top: 0;
+      position: fixed;
+      background-color: #eee;
+      height: 20px;
+      width: 100%;
+      /*z-index: 500;*/
+    }
+
+    #map{
+      top:  0px;
+      float: left;
+    }
+
+    .leaflet-top {
+      /*top: 70px;*/
+    }
+
+    #remote{
+
+      margin-right: 2px;
+      visibility  : hidden;
+
+    }
+
+    #bouton_t1_t2{
+
+      margin-top: 7px;
+
+    }
+
+    #right_pannel{
+      margin-top: 74px;
+      margin-left: 2px;
+      float: left;
+
+    }
+
+/*  #sidebar{
+display: none;
+}*/
+
+#map{
+
+  width: 60%;
+  height: 80%;
+}
+
+
+#dataplazza_btn{
+
+  line-height: 34px;
+  margin-right: -19px;
+}
+
+#sidebar{
+
+  display: none;
+}
+
+@media (max-width: 767px) {
+
+  .legend.leaflet-control{
+
+    margin-top: -30px;
+  }
+
+  #right_pannel{
+    float: none;
+    width:100%
+
+  }
+  #map{
+
+    width: 100%;
+  }
+/*    #sidebar{
+display: block;
+}
+#right_pannel{
+display: none;
+
+}*/
+#intro_top {
+  /*z-index: 1;*/
+}
+
+
+#remote{
+
+  display: none;
+
+}
+
+.leaflet-sidebar .close{
+  z-index: 800;
+}
+
+
+}
+
+/*for developpement only :*/
+
+/*#map{
+  display: none;
+}*/
+
+    .d3-tip {
+      line-height: 1;
+      padding: 6px;
+      background: rgba(250, 250, 250, 0.8);
+      color: #111;
+      border-radius: 4px;
+      border: 1px solid #777;
+      font-size: 12px;
+    }
+ 
+    /* Creates a small triangle extender for the tooltip */
+    .d3-tip:after {
+      box-sizing: border-box;
+      display: inline;
+      font-size: 10px;
+      width: 100%;
+      line-height: 1;
+      color: rgba(0, 0, 0, 0.8);
+      content: "\25BC";
+      position: absolute;
+      text-align: center;
+    }
+ 
+    /* Style northward tooltips specifically */
+    .d3-tip.n:after {
+      margin: -2px 0 0 0;
+      top: 100%;
+      left: 0;
+    }
+
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    clear: none;
+}
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="form-group">
+  <div class="container">
+    <div class="row">
+
+          <div class="col-md-3">
+
+            <label for="sel1">Sélectionner une méthode :</label>
+            <select class="form-control" id="method">
+            </select></div>
+            <div class="col-md-3">
+
+              <label for="sel1">Sélectionner une fédération :</label>
+              <select class="form-control" id="federation">
+              </select></div>
+      <div class="col-md-3">
+
+        <label for="sel1">Sélectionner une 1ere variable :</label>
+        <select class="form-control" id="var1">
+        </select></div>
+        <div class="col-md-3">
+
+          <label for="sel1">Sélectionner une seconde variable :</label>
+          <select class="form-control" id="var2">
+          </select></div>
+
+              <div class="col-md-3">
+
+                <input class="valide" id="param_1_submit" type="submit" value="Mettre à jour">
+
+                </div>
+
+              </div></div>
+
+
+            </div>
+
+            <div id="sidebar">
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  <div id="type_etablissement">cliquer sur les départements pour davantage de détails</div>
+                  <div><span id="departement"></span></div>
+                  <div id="moyenne"></div>
+                  <div id="nombre_rapports"></div>
+                </div>
+              </div>
+            </div>
+            <div id="map"></div>
+            <div id="right_pannel" style="width: 27%; height: 100%;">
+            <div id="chart"></div>
+
+              </div>
+              
+
+
+              <script>
+
+// Declarating Vars
+
+  var data_barchart = [],
+    data_map,
+    new_data,
+    svg_barchart,
+    gJson_layer,
+    defs,
+    gBrush,
+    brush,
+    main_xScale,
+    mini_xScale,
+    main_yScale,
+    mini_yScale,
+    main_yAxis,
+    mini_width,
+    textScale,
+    brushTotalStart,
+    brushTotalEnd,
+    updatedData,
+    mousewheelTimer,
+    scrolling = false,
+    scrollEnd = false,
+    n_handle,
+    miniGroup,
+    update_data,
+    info_map;
+
+// Color scheme : see here : 
+// https://github.com/d3/d3-scale-chromatic
+// Ex : interpolateBlues, interpolateGreens, interpolatePurples
+
+// var color_note = d3.scaleLinear().range(['lightgreen', 'darkgreen']);
+var color_note = d3.scaleSequential(d3.interpolateGreens);
+
+
+// var bars_color = "rgb(88, 184, 88)";
+// var bars_color = "rgb(71, 149, 200)";
+var bars_color = color_note(0.6);
+
+// Variables : update in case of change
+
+    var type_sport_code = [{'code':'nshn', 'libelle': 'Sportifs de haut niveau'}, {'code':'l_2013_n', 'libelle': 'Licenciés'}, {'code':'sub_ter_n', 'libelle': 'Subventions'}, {'code':'nent_n', 'libelle': 'Entreprises'}, {'code':'ndip_n', 'libelle': 'Diplomés'}];
+
+    var method = [{'code': 'uni', 'libelle': 'uni'}, {'code': 'ratio', 'libelle': 'ratio'}, {'code': 'corr', 'libelle': 'corr'}, {'code': 'autre', 'libelle': 'autre'}];
+
+  var data_key = 'departement';
+
+    var dep_names = {"01":"Ain","02":"Aisne","03":"Allier","04":"Alpes-de-Haute-Provence","05":"Hautes-Alpes","06":"Alpes-Maritimes","07":"Ard\u00e8che","08":"Ardennes","09":"Ari\u00e8ge","10":"Aube","11":"Aude","12":"Aveyron","13":"Bouches-du-Rh\u00f4ne","14":"Calvados","15":"Cantal","16":"Charente","17":"Charente-Maritime","18":"Cher","19":"Corr\u00e8ze","2A":"Corse-du-Sud","2B":"Haute-Corse","21":"C\u00f4te-d\u2019Or","22":"C\u00f4tes-d\u2019Armor","23":"Creuse","24":"Dordogne","25":"Doubs","26":"Dr\u00f4me","27":"Eure","28":"Eure-et-Loir","29":"Finist\u00e8re","30":"Gard","31":"Haute-Garonne","32":"Gers","33":"Gironde","34":"H\u00e9rault","35":"Ille-et-Vilaine","36":"Indre","37":"Indre-et-Loire","38":"Is\u00e8re","39":"Jura","40":"Landes","41":"Loir-et-Cher","42":"Loire","43":"Haute-Loire","44":"Loire-Atlantique","45":"Loiret","46":"Lot","47":"Lot-et-Garonne","48":"Loz\u00e8re","49":"Maine-et-Loire","50":"Manche","51":"Marne","52":"Haute-Marne","53":"Mayenne","54":"Meurthe-et-Moselle","55":"Meuse","56":"Morbihan","57":"Moselle","58":"Ni\u00e8vre","59":"Nord","60":"Oise","61":"Orne","62":"Pas-de-Calais","63":"Puy-de-D\u00f4me","64":"Pyr\u00e9n\u00e9es-Atlantiques","65":"Hautes-Pyr\u00e9n\u00e9es","66":"Pyr\u00e9n\u00e9es-Orientales","67":"Bas-Rhin","68":"Haut-Rhin","69":"Rh\u00f4ne","70":"Haute-Sa\u00f4ne","71":"Sa\u00f4ne-et-Loire","72":"Sarthe","73":"Savoie","74":"Haute-Savoie","75":"Paris","76":"Seine-Maritime","77":"Seine-et-Marne","78":"Yvelines","79":"Deux-S\u00e8vres","80":"Somme","81":"Tarn","82":"Tarn-et-Garonne","83":"Var","84":"Vaucluse","85":"Vend\u00e9e","86":"Vienne","87":"Haute-Vienne","88":"Vosges","89":"Yonne","90":"Territoire de Belfort","91":"Essonne","92":"Hauts-de-Seine","93":"Seine-Saint-Denis","94":"Val-de-Marne","95":"Val-d\u2019Oise"};
+
+   var tool_tip = d3.tip()
+      .attr("class", "d3-tip")
+      .offset([-8, 0])
+      .html(function(d) { return "<h5>" + dep_names[d[data_key]] +  ', '+ d[data_key] + '</h5>' +
+        '<p>Valeur : '  + _.round(d.value,2) + '</p>'; });
+
+
+
+      function matchKey(datapoint, key_variable, datapoint_type){
+
+          // var key_object = _.find(key_variable, function(e) { return e.departement == datapoint; });
+          var key_object = key_variable[datapoint];
+
+
+        if (typeof key_object === 'undefined') {
+
+          return 0;
+
+        }
+        else {
+          return parseFloat(key_object[datapoint_type]);
+        };
+      };
+
+// If small screen
+if ($(window).width() < 768) {var screendef = 0;}
+else{var screendef = 1;};
+
+d3.select("#Sidebar").attr('display', 'none');
+
+if (screendef == 1){
+  var ZoomView_dep = 6;
+  // d3.select("#Sidebar").attr('display', 'none');
+}
+else{
+  var  ZoomView_dep = 5;
+  // d3.select("#right_pannel").attr('display', 'none');
+}
+
+
+
+// Loading data :
+
+queue()
+.defer(d3.json, 'static/data/departements.geojson')
+.defer(d3.json, 'static/data/gf_demo2.json')
+.defer(d3.csv, 'static/data/fede_codes.csv')
+.await(makeMap)
+
+
+function makeMap(error, gjson, data_gf, fede_codes) {
+
+
+
+// Populating forms :
+
+var selectVar1And2 = d3.selectAll('#var1, #var2');
+
+selectVar1And2.selectAll('option')
+.data(type_sport_code)
+.enter()
+.append('option')
+.attr('value', function(d){ return d.code})
+.text(function(d){ return d.libelle});
+
+var selectMethod = d3.select('#method');
+
+selectMethod.selectAll('option')
+.data(method)
+.enter()
+.append('option')
+.attr('value', function(d){ return d.code})
+.text(function(d){ return d.libelle});
+
+
+var selectFede = d3.select('#federation');
+
+selectFede.selectAll('option')
+.data(fede_codes)
+.enter()
+.append('option')
+.attr('value', function(d){ return d.code_fede})
+.text(function(d){ return d.code_fede + ' : ' + d.libelle_fede});
+
+selectFede
+.insert('option', ":first-child")
+.attr('value', 'all')
+.text('Toutes les fédérations');
+
+
+
+
+////// If data_master is used : 
+
+// var array_dep = _.uniq(data_master.map(function(d){return d.department}));
+// array_dep_complete = array_dep.map(function(d){
+// var filtered = data_master.filter(function(e) {return e.department == d });
+// var federations = filtered.map(function(f){ return {'fedecode': f.fedecode, 'l2013': +f.l_2013_n, 'nshn': +f.nshn_n, 'sub_ter': +f.sub_ter_n}})
+// return {'department':d, 'ndip': +filtered[0].ndip_n, 'nent': +filtered[0].nent_n, 'nequ': +filtered[0].nequ_n, federations}
+// })
+
+
+// Data wrangling with data_gf (equipements)
+
+for (d in data_gf){
+  var entry = data_gf[d];
+  var joined = entry.fede_numbers.split("'").join('"');
+  entry.fede_numbers = JSON.parse(joined);
+
+  for (e in entry.fede_numbers)
+  {
+    entry.fede_numbers[e] = +entry.fede_numbers[e]
+  }
+
+  entry.ratio = Math.round(100* entry.fede_sum / entry.pop_2011);
+  entry.value = entry.ratio;
+  entry.departement = d;
+}
+
+
+data_barchart = d3.entries(data_gf).map(function(d){ return {'value':d.value.value, 'departement':d.key}});
+
+data_map = data_gf;
+
+
+
+// Ranges and scales
+
+var range_domain = d3.extent(d3.values(data_map), function(d){return d.value});
+var ticks_legend = d3.ticks(range_domain[0], range_domain[1], 8);
+color_note.domain(range_domain);
+var legend_scale_colors = ticks_legend.map(color_note);
+
+var color_note_legend = d3.scaleThreshold()
+.domain(ticks_legend)
+.range(legend_scale_colors);    
+
+
+/////// Configuring the map
+
+// Choices of tiles
+//https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+//https://{s}.tile.stamen.com/toner/
+//http://{s}.basemaps.cartocdn.com/light_all/
+//http://{s}.tile.openstreetmap.fr/osmfr/
+
+// Views and layers
+
+if (screendef ==0)
+{
+  map = L.map('map').setView([45.5, 2], ZoomView_dep);
+}
+else {
+  map = L.map('map').setView([48, 2], ZoomView_dep);
+
+}
+
+L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  minZoom: 1,
+  attribution: 'Map data (c) <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+css_preselector = "#right_pannel";
+
+// if (screendef == 0)
+// {
+
+//   var sidebar = L.control.sidebar('sidebar', {
+//     closeButton: true,
+//     position: 'left'
+//   });
+//   map.addControl(sidebar);
+// css_preselector = "#sidebar"
+
+
+
+// }
+
+
+
+
+
+////// Creating and updating Infobox
+
+info_map = L.control({position: 'topleft'});
+
+info_map.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+    this._div
+    this.update();
+    return this._div;
+};
+
+
+info_map.update = function (data_info) {
+
+d3.selectAll("rect.bar")
+.style('stroke-width', '0px');
+
+if (_.isUndefined(data_info) == false){
+d3.select("#bar_dep_" + data_info[data_key])
+.style('stroke', 'black')
+.style('stroke-width', '2px');
+}
+
+    this._div.innerHTML = (data_info ?
+      '<h4>'+ dep_names[data_info[data_key]] + ', ' + data_info[data_key] +'</h4>' +  
+        '<p> Valeur : ' + _.round(data_info.value,2) + '</p>'
+        : 'survoler les départements');
+};
+
+info_map.addTo(map);
+
+d3.select('div.info.leaflet-control')
+.style('margin-left', (map.getSize().x*0.3) + 'px' );
+
+// console.log(map.getSize().x);
+
+// Adding color layers
+
+
+gJson_layer = L.geoJson(gjson, {style: style_map, onEachFeature: onEachFeature}).addTo(map);
+
+if (screendef ==1)
+{
+  gJson_layer
+  .on('mouseover', function(e) {
+    var newd = e.layer.feature.properties.code;
+info_map.update(data_map[newd]);
+
+});
+}
+else
+{
+  // gJson_layer
+  // .on('click', function(e) {
+  //   var newd = e.layer.feature.properties.code;
+  //   d3.select(css_preselector + ' #departement').html('Département : <strong>' +data_map[newd][data_key] + ', (' + newd + ')');
+  //   d3.select(css_preselector + ' #type_etablissement').text('');
+  //   d3.select(css_preselector + ' #moyenne').html('Ratio  : <strong>' + Math.round(data_map[newd].value)  + '</strong>');
+  //   d3.select(css_preselector + ' #nombre_rapports').html('Nombre  : <strong>' + data_map[newd].fede_sum + '</strong>');
+  //   sidebar.show();
+
+  gJson_layer
+  .on('click', function(e) {
+    var newd = e.layer.feature.properties.code;
+info_map.update(data_map[newd]);
+
+
+});
+
+}
+
+// Setting up the legend
+
+var legend = L.control({position: 'topright'});
+legend.onAdd = function (map) {var div = L.DomUtil.create('div', 'legend'); return div};
+legend.addTo(map);
+
+
+var x = d3.scaleLinear()
+.domain(range_domain)
+.range([0, 400]);
+
+var xAxis = d3.axisTop()
+.scale(x)
+// .orient("top")
+.tickSize(1)
+.tickValues(ticks_legend);
+
+var svg = d3.select(".legend.leaflet-control").append("svg")
+.attr("id", 'legend')
+.attr("width", 450)
+.attr("height", 40);
+
+if (screendef == 0)
+{
+  svg.attr('width', 200)
+  .attr('height', 25)
+  .attr('font-size', '9px');
+  x.range([0,160]);
+}
+
+
+var g = svg.append("g")
+.attr("class", "key")
+.attr("transform", "translate(25,16)");
+
+
+
+g.selectAll("rect")
+.data(color_note_legend.range().map(function(d, i) {
+  return {
+    x0: i ? x(color_note_legend.domain()[i - 1]) : x.range()[0],
+    x1: i < color_note_legend.domain().length ? x(color_note_legend.domain()[i]) : x.range()[1],
+    z: d
+  };
+}))
+.enter().append("rect")
+.attr("height", 10)
+.attr("x", function(d) {return d.x0; })
+.attr("width", function(d) { return d.x1 - d.x0; })
+.style("fill", function(d) { return d.z; });
+
+g.call(xAxis).append("text")
+.attr("class", "caption")
+.attr("y", 21)
+.text('Tonalité moyenne des rapports des CRC');
+
+var legend = L.control({position: 'topright'});
+
+legend.onAdd = function (map) {var div = L.DomUtil.create('div', 'legend'); return div};
+
+legend.addTo(map);      
+
+
+// Calling the barchart
+
+init_barchart(data_barchart);
+
+
+    /////////////////////////////////////////////////////////////
+    ///////////////// Updating data from python ///////////////////
+    /////////////////////////////////////////////////////////////
+
+update_data = function(new_data){
+
+
+// Some data wrangling
+
+  new_data.forEach(function(d){
+    d[data_key] = d.department.toString().length < 2 ? '0' + d.department.toString() : d.department.toString();
+    d.value = d.result;
+  }
+  )
+
+  var new_data_by_dep = _.keyBy(new_data, function(o) {
+    return o[data_key];
+  });
+
+  data_map = new_data_by_dep;
+
+  new_data.sort(function(a,b) { return b.value - a.value; });
+
+  data_barchart = new_data;
+
+
+///////////////// Updating the map ///////////////////
+
+// Changing ranges, axes, colors and ticks
+
+  var range_domain = d3.extent(d3.values(new_data), function(d){return d.value});
+  var ticks_legend = d3.ticks(range_domain[0], range_domain[1], 8);
+
+
+  color_note.domain(range_domain);
+  x.domain(range_domain);
+
+  xAxis
+  .scale(x)
+  .tickValues(ticks_legend)
+  // .tickFormat(function(t){return addSpacesFr(t)})
+  ;
+
+  g.call(xAxis);
+
+
+  gJson_layer.setStyle(style_map);
+
+
+// Changing colors hovers
+
+  gJson_layer
+  .on('mouseover', function(e) {
+    var newd = e.layer.feature.properties.code;
+    info_map.update(data_map[newd]);
+  }); 
+
+///////////////// Updating the Barchart ///////////////////
+
+// First the main barchart
+
+// Changing scales
+
+main_xScale.domain([0, d3.max(new_data, function(d) { return d.value; })]);
+mini_yScale.domain(new_data.map(function(d) { return d[data_key]; }));
+
+
+ main_yScale.domain(new_data.map(function(d) { return d[data_key]; }));
+
+    main_yAxis = d3.axisLeft(main_yScale)
+      .tickSize(0)
+      // .outerTickSize(0)
+      .tickFormat(function(t){return dep_names[t]})
+      ;
+
+    d3.select(".mainGroup")
+      .select(".y.axis")
+      .call(main_yAxis);
+
+// Changing sizes, ids and tips
+
+var selection = d3.select(".mainGroup").selectAll(".bar")
+.data(new_data);
+
+selection
+.transition()
+.attr("width", function(d) { return main_xScale(d.value) >0 ? main_xScale(d.value) : 0; })
+.attr('id', function(d){return 'bar_dep_' + d[data_key]});
+
+selection.exit().remove();
+
+selection
+      .on('mouseover',  function(e) {
+        var target_layer = _.find(gJson_layer._layers, function(o) { return o.feature.properties.code  == e[data_key]; });
+        highlightFeature(target_layer, 'layer');
+        tool_tip.show(e);
+        info_map.update(data_map[e[data_key]])
+      })
+      .on('mouseout', function(e) {
+        var target_layer = _.find(gJson_layer._layers, function(o) { return o.feature.properties.code  == e[data_key]; });
+        resetHighlight(target_layer, 'layer');
+        tool_tip.hide(e)
+      });
+
+
+// Now the mini barchart
+
+    mini_xScale.domain([0, d3.max(new_data, function(d) { return d.value; })]);
+
+    //DATA JOIN
+    var mini_bar = d3.select(".miniGroup").selectAll(".bar")
+      .data(new_data);
+
+    mini_bar
+      .attr("width", function(d) { return mini_xScale(d.value) >0 ? mini_xScale(d.value) : 0; })
+      .attr('id', function(d){return 'minibar_dep_' + d[data_key]});
+
+mini_bar.exit().remove();
+
+}
+
+
+};
+
+
+    /////////////////////////////////////////////////////////////
+    ///////////////// Creating the barchart ///////////////////
+    /////////////////////////////////////////////////////////////
+
+    function init_barchart(data_barchart) {
+
+
+data_barchart.sort(function(a,b) { return b.value - a.value; })
+
+
+    /////////////////////////////////////////////////////////////
+    ///////////////// Set-up SVG and wrappers ///////////////////
+    /////////////////////////////////////////////////////////////
+
+    //Added only for the mouse wheel
+    var zoomer = d3.zoom()
+    .on("zoom", null);
+
+    var main_margin = {top: 10, right: 260, bottom: 10, left: 150},
+    main_width = 650 - main_margin.left - main_margin.right,
+    main_height = 600 - main_margin.top - main_margin.bottom;
+
+    var mini_margin = {top: 10, right: 10, bottom: 10, left: 10},
+    mini_height = 600 - mini_margin.top - mini_margin.bottom;
+    mini_width = 100 - mini_margin.left - mini_margin.right;
+
+    var initial_miniscale_height =  mini_height/1.95;
+
+    svg_barchart = d3.select("#chart").append("svg")
+    .attr("class", "svgWrapper")
+    .attr("width", main_width + main_margin.left + main_margin.right + mini_width + mini_margin.left + mini_margin.right)
+    .attr("height", main_height + main_margin.top + main_margin.bottom)
+    .call(zoomer)
+    .on("wheel.zoom", scroll)
+        //.on("mousewheel.zoom", scroll)
+        //.on("DOMMouseScroll.zoom", scroll)
+        //.on("MozMousePixelScroll.zoom", scroll)
+        //Is this needed?
+        .on("mousedown.zoom", null)
+        .on("touchstart.zoom", null)
+        .on("touchmove.zoom", null)
+        .on("touchend.zoom", null)
+        ;
+
+svg_barchart.call(tool_tip);
+
+    var mainGroup = svg_barchart.append("g")
+            .attr("class","mainGroup")
+            .attr("transform","translate(" + main_margin.left + "," + main_margin.top + ")");
+
+    miniGroup = svg_barchart.append("g")
+            .attr("class","miniGroup")
+            .attr("transform","translate(" + (main_margin.left + main_width + mini_margin.left) + "," + mini_margin.top + ")");
+
+
+
+    /////////////////////////////////////////////////////////////
+    ////////////////////// Initiating scales //////////////////////
+    /////////////////////////////////////////////////////////////
+
+    main_xScale = d3.scaleLinear().range([0, main_width]);
+    mini_xScale = d3.scaleLinear().range([0, mini_width]);
+
+    main_yScale = d3.scaleBand().range([0, main_height], 0.4, 0).paddingInner(0.4);
+    mini_yScale = d3.scaleBand().range([0, mini_height], 0.4, 0).paddingInner(0.4);
+
+    //Based on the idea from: http://stackoverflow.com/questions/21485339/d3-brushing-on-grouped-bar-chart
+    main_yZoom = d3.scaleLinear()
+        .range([0, main_height])
+        .domain([0, main_height]);
+
+    //Create x axis object
+    main_xAxis = d3.axisBottom(main_xScale)
+      .ticks(4)
+      //.tickSize(0)
+      // .outerTickSize(0)
+      ;
+
+    //Add group for the x axis
+    d3.select(".mainGroupWrapper").append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(" + 0 + "," + (main_height + 5) + ")");
+
+    //Create y axis object
+    main_yAxis = d3.axisLeft(main_yScale)
+      .tickSize(0)
+      // .outerTickSize(0)
+      .tickFormat(function(t){return dep_names[t]})
+      ;
+
+    //Add group for the y axis
+    mainGroup.append("g")
+        .attr("class", "y axis")
+        .attr("transform", "translate(-5,0)");
+ 
+    /////////////////////////////////////////////////////////////
+    /////////////////////// Updating scales ///////////////////////
+    /////////////////////////////////////////////////////////////
+
+    //Update the scales
+    main_xScale.domain([0, d3.max(data_barchart, function(d) { return d.value; })]);
+    mini_xScale.domain([0, d3.max(data_barchart, function(d) { return d.value; })]);
+    main_yScale.domain(data_barchart.map(function(d) { return d[data_key]; }));
+    mini_yScale.domain(data_barchart.map(function(d) { return d[data_key]; }));
+    
+    //Create the visual part of the y axis
+    d3.select(".mainGroup").select(".y.axis").call(main_yAxis);
+
+    d3.select(".mainGroupWrapper").select(".x.axis").call(main_xAxis);
+
+    /////////////////////////////////////////////////////////////
+    ///////////////////// Label axis scales /////////////////////
+    /////////////////////////////////////////////////////////////
+
+    textScale = d3.scaleLinear()
+      .domain([15,50])
+      .range([12,6])
+      .clamp(true);
+
+        /////////////////////////////////////////////////////////////
+    /////////////// Set-up the mini bar chart ///////////////////
+    /////////////////////////////////////////////////////////////
+
+    //The mini brushable bar
+    //DATA JOIN
+    var mini_bar = d3.select(".miniGroup").selectAll(".bar")
+      .data(data_barchart, function(d) { return d[data_key]; });
+
+
+    //UDPATE
+    mini_bar
+      .attr("width", function(d) { return mini_xScale(d.value); })
+      .attr("y", function(d,i) { return mini_yScale(d[data_key]); })
+      .attr("height", mini_yScale.bandwidth());
+
+    //ENTER
+    mini_bar.enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", 0)
+      .attr("width", function(d) { return mini_xScale(d.value); })
+      .attr("y", function(d,i) { return mini_yScale(d[data_key]); })
+      .attr("height", mini_yScale.bandwidth())
+      .style("fill", bars_color)
+      .attr('id', function(d){return 'minibar_dep_' + d[data_key]});
+
+    //EXIT
+    mini_bar.exit()
+      .remove();
+
+
+        /////////////////////////////////////////////////////////////
+    /////////////// Set-up the Brush and handles///////////////////
+    /////////////////////////////////////////////////////////////
+
+
+
+    brush = d3.brushY()
+        .extent([[0,0],[mini_width, mini_height]])
+        .handleSize(6)
+        .on("brush end", brushed)
+        ;
+
+
+    miniGroup.append("g")
+      .attr("class", "brush")
+      .call(brush)
+      .call(brush.move, [mini_yScale.range()[0], initial_miniscale_height])
+      ;
+
+      var n_handle = miniGroup.select("g.brush")
+      .append('g')
+      .attr('id', 'n_handle');
+
+      var s_handle = miniGroup.select("g.brush")
+      .append('g')
+      .attr('id', 's_handle');
+
+      n_handle
+            .append("line")
+            .attr("x2", mini_width)
+      .attr('stroke', '#222');
+
+
+      s_handle
+            .append("line")
+            .attr("x2", mini_width)
+      .attr('stroke', '#222');
+
+      s_handle
+      .attr("transform", "translate(0, " + initial_miniscale_height + ")");
+
+
+      n_handle
+      .append("path")
+      .attr("d", d3.symbol().type(d3.symbolTriangle).size(40))
+      .attr('fill', '#222')
+      .attr("transform", "translate(" + (mini_width/2) +", -4)");
+
+
+            s_handle
+      .append("path")
+      .attr("d", d3.symbol().type(d3.symbolTriangle).size(40))
+      .attr('fill', '#222')
+      .attr("transform", "translate(" + (mini_width/2) +", 4) rotate(180)");
+
+
+
+
+  }//init_barchart
+
+
+    /////////////////////////////////////////////////////////////
+    //////////////// typeahead : predictive typing //////////////////
+    /////////////////////////////////////////////////////////////
+
+var find_city = new Bloodhound({
+
+  datumTokenizer: Bloodhound.tokenizers.whitespace,
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+    url: 'http://map-api1.dataplazza.com/req1?id=%QUERY',
+
+    wildcard: '%QUERY'
+//local:dt01
+},
+limit:10
+});
+
+//city_fr.initialize();
+var data_city;
+var formatCityDep= function(data){
+
+  return data.commune+", ("+data.code_departement + ")" ;
+}
+
+$('#remote .typeahead').typeahead(null, {
+
+  display: function( data ) {
+    data_city = data;
+    return formatCityDep( data );
+  },
+  source: find_city,
+  limit:7,
+  templates: {
+    empty: 'Aucun resultat'
+  }
+})
+
+$('#remote .typeahead').on(
+{
+  'typeahead:selected': function(e, datum) {
+    y
+    window.location.href =  '/communes_droite/' +datum.code_departement + '/index.html?comm='+ datum.code_commune;
+
+  },
+  'typeahead:autocompleted': function(e, datum) {
+    y
+  }
+});
+
+
+    /////////////////////////////////////////////////////////////
+    //////////////// Getting data from Python //////////////////
+    /////////////////////////////////////////////////////////////
+
+
+$(function() {
+// Click on the form submit button to fire request
+$('#param_1_submit').click(function() {
+// var keywords = $('#mykeywords').val();
+var var1 = $('#var1').val();
+var var2 = $('#var2').val();
+var method = $('#method').val();
+var fede = $('#federation').val();
+
+$.ajax({
+// Request is posted to be used in python
+url: '/request',
+data: {"var1" : JSON.stringify(var1),
+"var2" : JSON.stringify(var2),
+"method" : JSON.stringify(method),
+"fede" : JSON.stringify(fede)
+
+},
+type: 'POST',
+
+// If success : 
+success: function(response) {
+
+  var data_parsed = JSON.parse(response);
+  new_data = JSON.parse(data_parsed.data);
+
+  
+  update_data(new_data);
+
+
+
+},
+// If error :
+error: function(error) {
+  console.log(error);
+}
+});
+});
+});
+
+
+    /////////////////////////////////////////////////////////////
+    //////////////// Updating the main bar chart //////////////////
+    /////////////////////////////////////////////////////////////
+
+
+  function update() {
+
+      //DATA JOIN
+      var selection = d3.select(".mainGroup").selectAll(".bar")
+      .data(data_barchart, function(d) { return d[data_key]; });
+
+
+    //UDPATE
+    selection
+    .attr("width", function(d) { return main_xScale(d.value); })
+    .attr("y", function(d,i) { return main_yScale(d[data_key]); })
+    .attr("height",  main_yScale.bandwidth());
+
+      //ENTER
+    selection.enter().append("rect")
+    .attr("class", "bar")
+    .attr('id', function(d){return 'bar_dep_' + d[data_key]})
+    .attr("x", 0)
+    .attr("width", function(d) { return main_xScale(d.value); })
+    .attr("y", function(d,i) { return main_yScale(d[data_key]); })
+    .attr("height",  main_yScale.bandwidth())
+    .style("fill", bars_color);
+
+
+selection
+      .on('mouseover',  function(e) {
+        var target_layer = _.find(gJson_layer._layers, function(o) { return o.feature.properties.code  == e[data_key]; });
+        highlightFeature(target_layer, 'layer');
+        tool_tip.show(e)
+        info_map.update(data_map[e[data_key]]);
+      })
+      .on('mouseout', function(e) {
+        var target_layer = _.find(gJson_layer._layers, function(o) { return o.feature.properties.code  == e[data_key]; });
+        resetHighlight(target_layer, 'layer');
+        tool_tip.hide(e)
+      });
+
+            //EXIT
+          selection.exit()
+      .remove();
+
+  }//update
+
+/////////////////////////////////////////////////////////////
+  ////////////////////// Brush functions //////////////////////
+  /////////////////////////////////////////////////////////////
+
+  //First function that runs on a brush move
+  function brushed() {
+
+    var s = d3.event.selection;
+
+    miniGroup.select('g.brush').select("#n_handle")
+    .attr('transform', 'translate(0,' + s[0] + ')');
+
+
+        miniGroup.select('g.brush').select("#s_handle")
+    .attr('transform', 'translate(0,' + s[1] + ')');
+
+
+    var originalRange = main_yZoom.range();
+
+    main_yZoom.domain( s );
+
+    /////////////////////////////////////////////////////////////
+    ///////////////////// Updating the axis ///////////////////////
+    /////////////////////////////////////////////////////////////
+
+    //Update the domain of the x & y scale of the big bar chart
+    main_yScale.domain(data_barchart.map(function(d) { return d[data_key]; }));
+    main_yScale.range( [ main_yZoom(originalRange[0]), main_yZoom(originalRange[1]) ]);
+
+
+
+    // main_xScale.domain([0, d3.max(new_data, function(d) { return d.value; })]);
+
+
+    //Update the y axis of the big chart
+    d3.select(".mainGroup")
+      .select(".y.axis")
+      .call(main_yAxis);
+
+    /////////////////////////////////////////////////////////////
+    /////////////// Update the mini bar fills ///////////////////
+    /////////////////////////////////////////////////////////////
+
+    //Update the colors within the mini bar chart
+    var selected = mini_yScale.domain()
+      .filter(function(d) { return (s[0] - mini_yScale.bandwidth() + 1e-2 <= mini_yScale(d)) && (mini_yScale(d) <= s[1] - 1e-2); }); 
+    //Update the colors of the mini chart - Make everything outside the brush grey
+    d3.select(".miniGroup").selectAll(".bar")
+    .style("fill", function(d, i) { return selected.indexOf(d[data_key]) > -1 ? bars_color : "#e0e0e0"; });
+
+
+    //Update the label size
+    d3.selectAll(".y.axis text")
+      .style("font-size", textScale(selected.length));
+    
+    //Update the big bar chart
+    update();
+    
+  }//brushmove
+
+
+  /////////////////////////////////////////////////////////////
+  ///////////////////// Scroll functions //////////////////////
+  /////////////////////////////////////////////////////////////
+
+  function scroll() {
+
+
+
+
+    //Mouse scroll on the mini chart
+    var extent = d3.brushSelection(miniGroup.select('g.brush').node()),
+      size = extent[1] - extent[0],
+      range = mini_yScale.range(),
+      y0 = d3.min(range),
+      y1 = d3.max(range) + mini_yScale.bandwidth(),
+      dy = -d3.event.deltaY,
+      topSection;
+
+    if ( extent[0] - dy < y0 ) { topSection = y0; } 
+    else if ( extent[1] - dy > y1 ) { topSection = y1 - size; } 
+    else { topSection = extent[0] - dy; }
+
+    //Make sure the page doesn't scroll as well
+    d3.event.stopPropagation();
+    d3.event.preventDefault();
+
+
+
+        miniGroup.select('g.brush')
+    .call(brush)
+    .call(brush.move, [ topSection, topSection + size ])
+    ;
+
+  }
+
+  // scroll
+
+  /////////////////////////////////////////////////////////////
+  ///////////////////// Utilities functions //////////////////////
+  /////////////////////////////////////////////////////////////
+
+function addSpacesFr(nStr)
+{
+  nStr += '';
+  x = nStr.split('.');
+  x1 = x[0];
+  x2 = x.length > 1 ? '.' + x[1] : '';
+  var rgx = /(\d+)(\d{3})/;
+  while (rgx.test(x1)) {
+    x1 = x1.replace(rgx, '$1' + ' ' + '$2');
+  }
+  return x1;
+}
+
+
+  /////////////////////////////////////////////////////////////
+  ///////////////////// Map styles //////////////////////
+  /////////////////////////////////////////////////////////////
+
+function style_map(feature) {
+
+return {
+  fillColor: color_note(matchKey(feature.properties.code, data_map, 'value')),
+  weight: 1,
+  opacity: 0.4,
+  color: 'black',
+  fillOpacity: 0.95
+};
+}
+
+
+function highlightFeature(e, type) {
+
+
+var layer = (type == 'layer') ? e : e.target;
+
+
+    layer.setStyle({
+        weight: 2,
+        color: '#222',
+        opacity:0.9,
+        fillOpacity: 1
+    });
+
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+    }
+}
+
+
+function resetHighlight(e, type) {
+
+var layer = (type == 'layer') ? e : e.target;
+
+    gJson_layer.resetStyle(layer);
+}
+
+  function onEachFeature(feature, layer) {
+    layer.on({
+      mouseover: highlightFeature,
+      mouseout: resetHighlight
+    });
+  }
+
+</script>
+
+
+</body>
+</html>
